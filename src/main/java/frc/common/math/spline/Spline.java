@@ -11,13 +11,14 @@ public class Spline {
     private Spline derivative;
 
     public Spline(SimpleMatrix basisMatrix, SimpleMatrix basisWeightMatrix) {
-        if (basisMatrix.numRows() != basisMatrix.numCols()) {
+        if (basisMatrix.getNumRows() != basisMatrix.getNumCols()) {
             throw new IllegalArgumentException("The basis matrix must be a square matrix");
         }
-        if (basisWeightMatrix.numRows() != basisMatrix.numCols()) {
-            throw new IllegalArgumentException("The basis weight matrix must be able to be multiplied by the basis matrix");
+        if (basisWeightMatrix.getNumRows() != basisMatrix.getNumCols()) {
+            throw new IllegalArgumentException(
+                    "The basis weight matrix must be able to be multiplied by the basis matrix");
         }
-        if (basisWeightMatrix.numCols() != 2) {
+        if (basisWeightMatrix.getNumCols() != 2) {
             throw new IllegalArgumentException("The basis weight matrix must have 2 columns");
         }
 
@@ -26,7 +27,7 @@ public class Spline {
     }
 
     public int getDegree() {
-        return basisMatrix.numCols() - 1;
+        return basisMatrix.getNumCols() - 1;
     }
 
     public SimpleMatrix getBasisMatrix() {
@@ -43,12 +44,13 @@ public class Spline {
      * @return The spline's derivative.
      */
     public Spline derivative() {
-        // The derivative is used when calculating the tangent or curvature. Cache it so we don't have to calculate it
+        // The derivative is used when calculating the tangent or curvature. Cache it so
+        // we don't have to calculate it
         // multiple times.
         if (derivative == null) {
             SimpleMatrix coefficients = basisMatrix.mult(basisWeightMatrix);
-            SimpleMatrix derivativeMatrix = new SimpleMatrix(coefficients.numRows() - 1, coefficients.numRows());
-            for (int i = 0; i < derivativeMatrix.numRows(); i++) {
+            SimpleMatrix derivativeMatrix = new SimpleMatrix(coefficients.getNumRows() - 1, coefficients.getNumRows());
+            for (int i = 0; i < derivativeMatrix.getNumRows(); i++) {
                 derivativeMatrix.set(i, i + 1, i + 1);
             }
 

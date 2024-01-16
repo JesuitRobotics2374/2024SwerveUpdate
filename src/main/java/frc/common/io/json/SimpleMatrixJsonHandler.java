@@ -9,9 +9,9 @@ public final class SimpleMatrixJsonHandler implements JsonSerializer<SimpleMatri
     @Override
     public JsonElement serialize(SimpleMatrix src, Type typeOfSrc, JsonSerializationContext context) {
         JsonArray root = new JsonArray();
-        for (int row = 0; row < src.numRows(); row++) {
+        for (int row = 0; row < src.getNumRows(); row++) {
             JsonArray r = new JsonArray();
-            for (int col = 0; col < src.numCols(); col++) {
+            for (int col = 0; col < src.getNumCols(); col++) {
                 r.add(src.get(row, col));
             }
 
@@ -22,7 +22,8 @@ public final class SimpleMatrixJsonHandler implements JsonSerializer<SimpleMatri
     }
 
     @Override
-    public SimpleMatrix deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public SimpleMatrix deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+            throws JsonParseException {
         double[][] arr = context.deserialize(json, double[][].class);
 
         return new SimpleMatrix(arr);

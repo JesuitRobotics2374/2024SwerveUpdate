@@ -33,8 +33,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
             * (16.0 / 48.0) * (28.0 / 16.0) * (15.0 / 45.0)
             * 0.1017
             * Math.PI;
-    public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND
-            / Math.hypot(DRIVETRAIN_LENGTH_METERS / 2.0, DRIVETRAIN_WIDTH_METERS / 2.0);
+    public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = 2 * Math.PI * MAX_VELOCITY_METERS_PER_SECOND
+            / (Math.sqrt(Constants.DRIVETRAIN_LENGTH_METERS * Constants.DRIVETRAIN_LENGTH_METERS
+                    + DRIVETRAIN_WIDTH_METERS * DRIVETRAIN_WIDTH_METERS) * Math.PI);
 
     public static final DrivetrainFeedforwardConstants FEEDFORWARD_CONSTANTS = new DrivetrainFeedforwardConstants(
             0.891,
@@ -65,7 +66,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
             .withDriveMotorGains(new Slot0Configs().withKP(0.2).withKI(0).withKD(0.1))
             .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
             .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-            .withSpeedAt12VoltsMps(16.5)
+            .withSpeedAt12VoltsMps(MAX_VELOCITY_METERS_PER_SECOND)
             .withFeedbackSource(SteerFeedbackType.RemoteCANcoder)
             .withSteerMotorInverted(true);
 

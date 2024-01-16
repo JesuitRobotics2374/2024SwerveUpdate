@@ -29,11 +29,11 @@ class BezierSplineHelper {
     }
 
     public static Vector2[] basisWeightMatrixToControlPoints(SimpleMatrix basisWeightMatrix) {
-        if (basisWeightMatrix.numCols() != 2) {
+        if (basisWeightMatrix.getNumCols() != 2) {
             throw new IllegalArgumentException("Basis weight matrix must have 2 columns");
         }
 
-        Vector2[] controlPoints = new Vector2[basisWeightMatrix.numRows()];
+        Vector2[] controlPoints = new Vector2[basisWeightMatrix.getNumRows()];
         for (int i = 0; i < controlPoints.length; i++) {
             controlPoints[i] = new Vector2(basisWeightMatrix.get(i, 0), basisWeightMatrix.get(i, 1));
         }
