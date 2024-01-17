@@ -20,9 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.common.control.*;
-import frc.common.util.DrivetrainFeedforwardConstants;
-import frc.common.util.HolonomicFeedforward;
 
 import static frc.robot.Constants.*;
 
@@ -37,20 +34,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
             / (Math.sqrt(Constants.DRIVETRAIN_LENGTH_METERS * Constants.DRIVETRAIN_LENGTH_METERS
                     + DRIVETRAIN_WIDTH_METERS * DRIVETRAIN_WIDTH_METERS) * Math.PI);
 
-    public static final DrivetrainFeedforwardConstants FEEDFORWARD_CONSTANTS = new DrivetrainFeedforwardConstants(
-            0.891,
-            0.15, 0.13592);
-
     public static final double DRIVETRAIN_CURRENT_LIMIT = 50.0;
-
-    public static final TrajectoryConstraint[] TRAJECTORY_CONSTRAINTS = {
-            new FeedforwardConstraint(1.5, FEEDFORWARD_CONSTANTS.getVelocityConstant(),
-                    FEEDFORWARD_CONSTANTS.getAccelerationConstant(), false),
-            new MaxAccelerationConstraint(3.0), new CentripetalAccelerationConstraint(1.0) };
-
-    private final HolonomicMotionProfiledTrajectoryFollower follower = new HolonomicMotionProfiledTrajectoryFollower(
-            new PidConstants(1, 0.02, .06), new PidConstants(1, 0.02, .06),
-            new HolonomicFeedforward(FEEDFORWARD_CONSTANTS));
 
     private final Pigeon2 pigeon = new Pigeon2(DRIVETRAIN_PIGEON_CAN_ID, Constants.CAN_BUS_NAME_DRIVETRAIN);
 
@@ -103,21 +87,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         tab.addNumber("Odometry X", () -> Units.metersToFeet(getPose().getX()));
         tab.addNumber("Odometry Y", () -> Units.metersToFeet(getPose().getY()));
         tab.addNumber("Odometry Angle", () -> getPose().getRotation().getDegrees());
-        tab.addNumber("Trajectory Position X", () -> {
-            var lastState = follower.getLastState();
-            if (lastState == null)
-                return 0;
-
-            return Units.metersToFeet(lastState.getPathState().getPosition().x);
-        });
-
-        tab.addNumber("Trajectory Velocity X", () -> {
-            var lastState = follower.getLastState();
-            if (lastState == null)
-                return 0;
-
-            return Units.metersToFeet(lastState.getVelocity());
-        });
         tab.addNumber("Gyroscope Angle", () -> getGyroscopeRotation().getDegrees());
     }
 
@@ -143,10 +112,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
      */
     public Pose2d getPose() {
         return swerveDrivetrain.getState().Pose;
-    }
-
-    public HolonomicMotionProfiledTrajectoryFollower getFollower() {
-        return follower;
     }
 
     /**

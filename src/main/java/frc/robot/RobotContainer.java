@@ -11,14 +11,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.AutonomousChooser;
-import frc.robot.util.AutonomousTrajectories;
 
 public class RobotContainer {
     private final ChassisSubsystem m_ChassisSubsystem;
     private final DrivetrainSubsystem m_DrivetrainSubsystem;
 
-    private final AutonomousChooser autonomousChooser = new AutonomousChooser(
-            new AutonomousTrajectories(DrivetrainSubsystem.TRAJECTORY_CONSTRAINTS));
+    private final AutonomousChooser autonomousChooser = new AutonomousChooser();
 
     private final XboxController m_driveController = new XboxController(Constants.CONTROLLER_USB_PORT_DRIVER);
     private final XboxController m_operatorController = new XboxController(Constants.CONTROLLER_USB_PORT_OPERATOR);

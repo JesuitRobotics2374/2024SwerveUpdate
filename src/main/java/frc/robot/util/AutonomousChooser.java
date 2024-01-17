@@ -10,8 +10,6 @@ import frc.robot.HolonomicControl.FollowCommand;
 import frc.robot.HolonomicControl.HolonomicPathBuilder;
 import frc.robot.HolonomicControl.Splines.Line;
 import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.common.control.Path;
-import frc.common.control.Trajectory;
 
 public class AutonomousChooser {
     private final AutonomousTrajectories trajectories;
@@ -23,8 +21,8 @@ public class AutonomousChooser {
 
     private final SendableChooser<AutonomousMode> autonomousModeChooser = new SendableChooser<>();
 
-    public AutonomousChooser(AutonomousTrajectories trajectories) {
-        this.trajectories = trajectories;
+    public AutonomousChooser() {
+        this.trajectories = new AutonomousTrajectories(XYconstraints, Rconstraints);
 
         autonomousModeChooser.setDefaultOption("Test thing", AutonomousMode.ONE_METER_F);
     }
@@ -46,10 +44,8 @@ public class AutonomousChooser {
         return command;
     }
 
-    public Command resetRobotPose(RobotContainer container, Trajectory trajectory) {
-        Path.State start = trajectory.getPath().calculate(0.0);
-        return new InstantCommand(() -> container.getDrivetrain().setPose(new Pose2d(start.getPosition().x,
-                start.getPosition().y, new Rotation2d(start.getRotation().toRadians()))));
+    public Command resetRobotPose(RobotContainer container, Pose2d pose2d) {
+        return new InstantCommand(() -> container.getDrivetrain().setPose(pose2d));
     }
 
     public Command resetRobotPose(RobotContainer container) {
