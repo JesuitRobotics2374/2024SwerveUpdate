@@ -32,7 +32,7 @@ public class RobotContainer {
      */
     public RobotContainer() {
         m_ChassisSubsystem = new ChassisSubsystem();
-        m_DrivetrainSubsystem = new DrivetrainSubsystem(this);
+        m_DrivetrainSubsystem = new DrivetrainSubsystem();
         System.out.println("container created");
 
         // resetDrive();

@@ -78,7 +78,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     private final Field2d m_field = new Field2d();
 
-    public DrivetrainSubsystem(RobotContainer container) {
+    public DrivetrainSubsystem() {
         pigeon.getConfigurator().apply(new MountPoseConfigs().withMountPosePitch(180));
         Shuffleboard.getTab(Constants.DRIVER_READOUT_TAB_NAME).addNumber("yaw",
                 () -> pigeon.getYaw().getValueAsDouble());
