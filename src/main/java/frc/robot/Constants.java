@@ -26,8 +26,8 @@ public class Constants {
     public static final double ARM_LIMIT = 0;
 
     // DRIVETRAIN Subsystem
-    public static final double DRIVETRAIN_LENGTH_METERS = Units.inchesToMeters(20.5);
-    public static final double DRIVETRAIN_WIDTH_METERS = Units.inchesToMeters(20.5);
+    public static final double DRIVETRAIN_LENGTH_METERS = Units.inchesToMeters(18.5);
+    public static final double DRIVETRAIN_WIDTH_METERS = Units.inchesToMeters(21.5);
     public static final double DRIVETRAIN_LENGTH_METERS_TEST = Units.inchesToMeters(19);
     public static final double DRIVETRAIN_WIDTH_METERS_TEST = Units.inchesToMeters(20.5);
     public static final int DRIVETRAIN_PIGEON_CAN_ID = 29; // the CAN ID for the FASTFD CAN Bus

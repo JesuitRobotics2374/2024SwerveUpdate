@@ -19,7 +19,6 @@ public class RobotContainer {
     private final AutonomousChooser autonomousChooser = new AutonomousChooser();
 
     private final XboxController m_driveController = new XboxController(Constants.CONTROLLER_USB_PORT_DRIVER);
-    private final XboxController m_operatorController = new XboxController(Constants.CONTROLLER_USB_PORT_OPERATOR);
 
     private SlewRateLimiter xLimiter = new SlewRateLimiter(5);
     private SlewRateLimiter yLimiter = new SlewRateLimiter(5);
@@ -35,7 +34,7 @@ public class RobotContainer {
         m_DrivetrainSubsystem = new DrivetrainSubsystem();
         System.out.println("container created");
 
-        // resetDrive();
+        resetDrive();
 
         configureButtonBindings();
         configureShuffleBoard();
@@ -57,15 +56,6 @@ public class RobotContainer {
      */
     public XboxController getMainController() {
         return m_driveController;
-    }
-
-    /**
-     * Get the second controller
-     * 
-     * @return The second controller
-     */
-    public XboxController getSecondController() {
-        return m_operatorController;
     }
 
     /**
