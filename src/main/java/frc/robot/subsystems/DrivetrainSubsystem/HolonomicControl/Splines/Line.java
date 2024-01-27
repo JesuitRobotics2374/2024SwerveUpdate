@@ -14,13 +14,14 @@ public class Line extends SplineAbstract {
 
     public Line(Constraints XYconstraints, Constraints Rconstraints, Pose2d endPose2d, boolean fieldCentric) {
         this.endPose2d = endPose2d;
-        Xcontroller = new ProfiledPIDController(0.2, 0, 0.1, XYconstraints);
-        Ycontroller = new ProfiledPIDController(0.2, 0, 0.1, XYconstraints);
-        Rcontroller = new ProfiledPIDController(0.2, 0, 0.1, Rconstraints);
+        Xcontroller = new ProfiledPIDController(1.6, 0.3, 0.1, XYconstraints);
+        Ycontroller = new ProfiledPIDController(1.6, 0.3, 0.1, XYconstraints);
+        Rcontroller = new ProfiledPIDController(0.4, 0.08, 0.025, Rconstraints);
         Rcontroller.enableContinuousInput(0, Math.PI * 2);
         Xcontroller.setGoal(endPose2d.getX());
         Ycontroller.setGoal(endPose2d.getY());
         Rcontroller.setGoal(endPose2d.getRotation().getDegrees());
+        Rcontroller.setTolerance(Math.PI / 36);
         this.fieldCentric = fieldCentric;
     }
 
@@ -35,6 +36,9 @@ public class Line extends SplineAbstract {
             Ycontroller.setGoal(endPose2d.getY() + currentPose2d.getY());
             Rcontroller.setGoal(endPose2d.getRotation().getRadians() + currentPose2d.getRotation().getRadians());
         }
+        Xcontroller.reset(currentPose2d.getX());
+        Ycontroller.reset(currentPose2d.getY());
+        Rcontroller.reset(currentPose2d.getRotation().getRadians());
     }
 
     @Override

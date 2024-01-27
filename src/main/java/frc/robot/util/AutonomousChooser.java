@@ -13,8 +13,8 @@ import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.Splines.Line;
 public class AutonomousChooser {
     private final AutonomousTrajectories trajectories;
 
-    private final Constraints XYconstraints = new Constraints(6 / 4,
-            1);
+    private final Constraints XYconstraints = new Constraints(2,
+            2);
     private final Constraints Rconstraints = new Constraints(
             Math.PI * .5 / 4, 1);
 

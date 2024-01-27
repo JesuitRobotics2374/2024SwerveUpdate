@@ -2,6 +2,9 @@ package frc.robot;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.GyroTrimConfigs;
+import com.ctre.phoenix6.configs.MountPoseConfigs;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
 import edu.wpi.first.cameraserver.CameraServer;
@@ -10,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.DrivetrainSubsystem.CommandSwerveDrivetrain;
@@ -23,7 +27,7 @@ public class RobotContainer {
     private final ChassisSubsystem m_ChassisSubsystem;
     private final CommandSwerveDrivetrain m_DrivetrainSubsystem = TunerConstants.DriveTrain;
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.07) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
                                                                      // driving in open loop
     private final AutonomousChooser autonomousChooser = new AutonomousChooser();
@@ -42,11 +46,17 @@ public class RobotContainer {
         m_ChassisSubsystem = new ChassisSubsystem();
 
         System.out.println("container created");
-
-        resetDrive();
-
-        configureButtonBindings();
         configureShuffleBoard();
+        resetDrive();
+        configureButtonBindings();
+        // m_DrivetrainSubsystem.getState().Pose = new
+        // Pose2d(m_DrivetrainSubsystem.getState().Pose.getTranslation(),
+        // new Rotation2d());
+        m_DrivetrainSubsystem.seedFieldRelative(new Pose2d());
+        // m_DrivetrainSubsystem.getPigeon2().getConfigurator()
+        // .apply(new Pigeon2Configuration().withMountPose(new
+        // MountPoseConfigs().withMountPoseYaw(0)));
+
     }
 
     /**
@@ -100,6 +110,9 @@ public class RobotContainer {
         tab.addBoolean("ROLL", () -> isRoll()).withPosition(2, 1);
         // tab.addBoolean("Auto", () ->
         // m_drivetrainSubsystem.getFollower().getCurrentTrajectory().isPresent());
+        tab.addDouble("X", () -> m_DrivetrainSubsystem.getState().Pose.getX());
+        tab.addDouble("Y", () -> m_DrivetrainSubsystem.getState().Pose.getY());
+        tab.addDouble("R", () -> m_DrivetrainSubsystem.getState().Pose.getRotation().getDegrees());
     }
 
     /**
@@ -108,7 +121,10 @@ public class RobotContainer {
     public void configureButtonBindings() {
         // Drivetrain
         m_driveController.back().onTrue(m_DrivetrainSubsystem.runOnce(() -> m_DrivetrainSubsystem.seedFieldRelative()));
-
+        m_driveController.leftBumper().onTrue(new InstantCommand(() -> toggleSlow()));
+        m_driveController.rightBumper().onTrue(new InstantCommand(() -> toggleRoll()));
+        m_driveController.start()
+                .onTrue(new InstantCommand(() -> System.out.println(m_DrivetrainSubsystem.getState().Pose)));
         // new Trigger(m_operatorController::getXButton)
         // .onTrue(new InstantCommand(m_ManipulatorSubsystem::rotateLeft,
         // m_ManipulatorSubsystem));
@@ -181,6 +197,7 @@ public class RobotContainer {
             MaxSpeed = 6;
             MaxAngularRate = Math.PI * 1.5;
         }
+        System.out.println(MaxSpeed);
     }
 
     /**

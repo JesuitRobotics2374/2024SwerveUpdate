@@ -32,9 +32,12 @@ public class FollowCommand extends Command {
     @Override
     public void execute() {
         ChassisSpeeds speeds = builder.pathList.peekFirst().getMovement(subsystem.getState().Pose);
-        subsystem.applyRequest(() -> drive.withVelocityX(speeds.vxMetersPerSecond)
+        System.out.println("Speeds: " + speeds);
+        // System.out.println("Pose: " + subsystem.getState().Pose);
+        subsystem.setControl(drive.withVelocityX(speeds.vxMetersPerSecond)
                 .withVelocityY(speeds.vyMetersPerSecond).withRotationalRate(speeds.omegaRadiansPerSecond));
         builder.clense(subsystem.getState().Pose);
+
     }
 
     @Override
