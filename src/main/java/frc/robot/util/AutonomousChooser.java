@@ -6,18 +6,17 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.RobotContainer;
-import frc.robot.HolonomicControl.FollowCommand;
-import frc.robot.HolonomicControl.HolonomicPathBuilder;
-import frc.robot.HolonomicControl.Splines.Line;
-import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.FollowCommand;
+import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.HolonomicPathBuilder;
+import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.Splines.Line;
 
 public class AutonomousChooser {
     private final AutonomousTrajectories trajectories;
 
-    private final Constraints XYconstraints = new Constraints(DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND / 4,
+    private final Constraints XYconstraints = new Constraints(6 / 4,
             1);
     private final Constraints Rconstraints = new Constraints(
-            DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 4, 4);
+            Math.PI * .5 / 4, 1);
 
     private final SendableChooser<AutonomousMode> autonomousModeChooser = new SendableChooser<>();
 
@@ -45,12 +44,12 @@ public class AutonomousChooser {
     }
 
     public Command resetRobotPose(RobotContainer container, Pose2d pose2d) {
-        return new InstantCommand(() -> container.getDrivetrain().setPose(pose2d));
+        return new InstantCommand(() -> container.getDrivetrain().seedFieldRelative(pose2d));
     }
 
     public Command resetRobotPose(RobotContainer container) {
         return new InstantCommand(
-                () -> container.getDrivetrain().setPose(new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
+                () -> container.getDrivetrain().seedFieldRelative(new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
     }
 
     // Handler to determine what command was requested for the autonmous routine to

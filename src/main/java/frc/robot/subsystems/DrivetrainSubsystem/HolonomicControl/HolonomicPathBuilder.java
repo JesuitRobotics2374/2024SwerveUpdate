@@ -1,9 +1,9 @@
-package frc.robot.HolonomicControl;
+package frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl;
 
 import java.util.LinkedList;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import frc.robot.HolonomicControl.Splines.SplineAbstract;
+import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.Splines.SplineAbstract;
 
 public class HolonomicPathBuilder {
     LinkedList<SplineAbstract> pathList = new LinkedList<>();

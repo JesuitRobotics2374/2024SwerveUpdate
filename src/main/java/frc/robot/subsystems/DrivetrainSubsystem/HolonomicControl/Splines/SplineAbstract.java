@@ -1,4 +1,4 @@
-package frc.robot.HolonomicControl.Splines;
+package frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.Splines;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;

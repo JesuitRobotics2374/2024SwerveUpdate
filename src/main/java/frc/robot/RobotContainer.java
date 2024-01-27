@@ -1,27 +1,36 @@
 package frc.robot;
 
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.*;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.DrivetrainSubsystem.CommandSwerveDrivetrain;
+import frc.robot.subsystems.DrivetrainSubsystem.Telemetry;
+import frc.robot.subsystems.DrivetrainSubsystem.TunerConstants;
 import frc.robot.util.AutonomousChooser;
 
 public class RobotContainer {
+    private double MaxSpeed = 6; // 6 meters per second desired top speed
+    private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
     private final ChassisSubsystem m_ChassisSubsystem;
-    private final DrivetrainSubsystem m_DrivetrainSubsystem;
-
+    private final CommandSwerveDrivetrain m_DrivetrainSubsystem = TunerConstants.DriveTrain;
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
+                                                                     // driving in open loop
     private final AutonomousChooser autonomousChooser = new AutonomousChooser();
+    private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final XboxController m_driveController = new XboxController(Constants.CONTROLLER_USB_PORT_DRIVER);
-
-    private SlewRateLimiter xLimiter = new SlewRateLimiter(5);
-    private SlewRateLimiter yLimiter = new SlewRateLimiter(5);
+    private final CommandXboxController m_driveController = new CommandXboxController(
+            Constants.CONTROLLER_USB_PORT_DRIVER);
 
     private boolean slow = false;
     private boolean roll = false;
@@ -31,7 +40,7 @@ public class RobotContainer {
      */
     public RobotContainer() {
         m_ChassisSubsystem = new ChassisSubsystem();
-        m_DrivetrainSubsystem = new DrivetrainSubsystem();
+
         System.out.println("container created");
 
         resetDrive();
@@ -44,9 +53,21 @@ public class RobotContainer {
      * Reset the default drive command
      */
     public void resetDrive() {
-        m_DrivetrainSubsystem.setDefaultCommand(
-                new DefaultDriveCommand(m_DrivetrainSubsystem, this::getForwardInput, this::getStrafeInput,
-                        this::getRotationInput));
+        m_DrivetrainSubsystem.setDefaultCommand( // Drivetrain will execute this command periodically
+                m_DrivetrainSubsystem.applyRequest(() -> drive.withVelocityX(-m_driveController.getLeftY() * MaxSpeed) // Drive
+                        // forward
+                        // with
+                        // negative Y (forward)
+                        .withVelocityY(-m_driveController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(-m_driveController.getRightX() * MaxAngularRate) // Drive counterclockwise
+                                                                                             // with
+                // negative X (left)
+                ));
+
+        if (Utils.isSimulation()) {
+            m_DrivetrainSubsystem.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+        }
+        m_DrivetrainSubsystem.registerTelemetry(logger::telemeterize);
     }
 
     /**
@@ -54,7 +75,7 @@ public class RobotContainer {
      * 
      * @return The main controller
      */
-    public XboxController getMainController() {
+    public CommandXboxController getMainController() {
         return m_driveController;
     }
 
@@ -86,12 +107,7 @@ public class RobotContainer {
      */
     public void configureButtonBindings() {
         // Drivetrain
-        new Trigger(m_driveController::getBackButton)
-                .onTrue(new InstantCommand(m_DrivetrainSubsystem::zeroRotation, m_DrivetrainSubsystem));
-        new Trigger(m_driveController::getLeftBumper).debounce(0.1, DebounceType.kFalling)
-                .onTrue(new InstantCommand(this::toggleSlow));
-        new Trigger(m_driveController::getRightBumper).debounce(0.1, DebounceType.kFalling)
-                .onTrue(new InstantCommand(this::toggleRoll));
+        m_driveController.back().onTrue(m_DrivetrainSubsystem.runOnce(() -> m_DrivetrainSubsystem.seedFieldRelative()));
 
         // new Trigger(m_operatorController::getXButton)
         // .onTrue(new InstantCommand(m_ManipulatorSubsystem::rotateLeft,
@@ -136,63 +152,6 @@ public class RobotContainer {
         return Math.copySign(value * value, value);
     }
 
-    /**
-     * Get the adjusted Left Y axis of the main controller
-     * 
-     * @return The adjusted Left Y axis of the main controller
-     */
-    private double getForwardInput() {
-        if (slow) {
-            return -square(yLimiter.calculate(deadband(m_driveController.getLeftY(), 0.1))
-                    * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND
-                    * DrivetrainSubsystem.SPEED_MULTIPLIER * 0.2);
-        } else if (roll) {
-            return -square(yLimiter.calculate(deadband(m_driveController.getLeftY(), 0.1))
-                    * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND
-                    * DrivetrainSubsystem.SPEED_MULTIPLIER * .5);
-        } else {
-            return -square(yLimiter.calculate(deadband(m_driveController.getLeftY(), 0.1))
-                    * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND
-                    * DrivetrainSubsystem.SPEED_MULTIPLIER);
-        }
-    }
-
-    /**
-     * Get the adjusted Left X axis of the main controller
-     * 
-     * @return The adjusted Left X axis of the main controller
-     */
-    private double getStrafeInput() {
-        if (slow) {
-            return -square(xLimiter.calculate(deadband(m_driveController.getLeftX(), 0.1))
-                    * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND
-                    * DrivetrainSubsystem.SPEED_MULTIPLIER * 0.2);
-        } else if (roll) {
-            return -square(xLimiter.calculate(deadband(m_driveController.getLeftX(), 0.1))
-                    * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND
-                    * DrivetrainSubsystem.SPEED_MULTIPLIER * 0.5);
-        } else {
-            return -square(xLimiter.calculate(deadband(m_driveController.getLeftX(), 0.1))
-                    * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND
-                    * DrivetrainSubsystem.SPEED_MULTIPLIER);
-        }
-    }
-
-    /**
-     * Get the adjusted Right X axis of the main controller
-     * 
-     * @return The adjusted Right X axis of the main controller
-     */
-    private double getRotationInput() {
-        if (slow) {
-            return -square(deadband(m_driveController.getRightX(), 0.1))
-                    * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * .2 * 0.33;
-        } else {
-            return -square(deadband(m_driveController.getRightX(), 0.1))
-                    * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * .2;
-        }
-    }
-
     public boolean isSlow() {
         return slow;
     }
@@ -203,10 +162,25 @@ public class RobotContainer {
 
     public void toggleSlow() {
         slow = !slow;
+        updateSpeeds();
     }
 
     public void toggleRoll() {
         roll = !roll;
+        updateSpeeds();
+    }
+
+    private void updateSpeeds() {
+        if (slow) {
+            MaxSpeed = 1.5;
+            MaxAngularRate = Math.PI * .5;
+        } else if (roll) {
+            MaxSpeed = 3;
+            MaxAngularRate = Math.PI * 1;
+        } else {
+            MaxSpeed = 6;
+            MaxAngularRate = Math.PI * 1.5;
+        }
     }
 
     /**
@@ -232,7 +206,7 @@ public class RobotContainer {
      * 
      * @return The DriveTrain Subsystem
      */
-    public DrivetrainSubsystem getDrivetrain() {
+    public CommandSwerveDrivetrain getDrivetrain() {
         return m_DrivetrainSubsystem;
     }
 }
