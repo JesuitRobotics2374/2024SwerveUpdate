@@ -73,7 +73,7 @@ public class RobotContainer {
                                                                                              // with
                 // negative X (left)
                 ));
-
+        m_DrivetrainSubsystem.seedFieldRelative();
         if (Utils.isSimulation()) {
             m_DrivetrainSubsystem.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         }
@@ -188,13 +188,13 @@ public class RobotContainer {
 
     private void updateSpeeds() {
         if (slow) {
-            MaxSpeed = 1.5;
+            MaxSpeed = 0.75;
             MaxAngularRate = Math.PI * .5;
         } else if (roll) {
-            MaxSpeed = 3;
+            MaxSpeed = 1.5;
             MaxAngularRate = Math.PI * 1;
         } else {
-            MaxSpeed = 6;
+            MaxSpeed = 3;
             MaxAngularRate = Math.PI * 1.5;
         }
         System.out.println(MaxSpeed);
