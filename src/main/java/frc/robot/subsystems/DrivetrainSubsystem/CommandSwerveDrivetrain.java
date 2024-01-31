@@ -8,8 +8,14 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -28,6 +34,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private double m_lastSimTime;
     ShuffleboardTab tab = Shuffleboard.getTab(Constants.DRIVER_READOUT_TAB_NAME);
     Field2d field = new Field2d();
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry pose = table.getEntry("botpose");
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency,
             SwerveModuleConstants... modules) {
@@ -67,7 +75,18 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     @Override
     public void periodic() {
+        double[] array = pose.getDoubleArray(new double[0]);
+        if (array.length > 0) {
+            field.getObject("Vision").setPose(
+                    new Pose2d(array[0] + 8.308975, -array[1] + 4.098925, new Rotation2d(Math.toRadians(array[5]))));
+            double offset = Math
+                    .sqrt(Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getX(), 2)
+                            + Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getY(), 2));
+            if (offset < 1 && Math.abs(field.getObject("Vision").getPose().getRotation().getDegrees()
+                    - getState().Pose.getRotation().getDegrees()) < 30) {
+                addVisionMeasurement(field.getObject("Vision").getPose(), Timer.getFPGATimestamp());
+            }
+        }
         field.setRobotPose(getState().Pose);
-        // addVisionMeasurement(, );
     }
 }

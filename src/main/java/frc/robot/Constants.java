@@ -18,8 +18,8 @@ public class Constants {
     public static final String CAN_BUS_NAME_DRIVETRAIN = CAN_BUS_NAME_CANIVORE;
 
     // IO Controller definitions
-    public static final int CONTROLLER_USB_PORT_DRIVER = 0; // Drivers Controller
-    public static final int CONTROLLER_USB_PORT_OPERATOR = 1; // Ordanence operators controller
+    public static final int CONTROLLER_USB_PORT_DRIVER = 1; // Drivers Controller
+    public static final int CONTROLLER_USB_PORT_OPERATOR = 0; // Ordanence operators controller
 
     // ARM Subsystem
     public static final int ARM_MOTOR_CAN_ID = 8; // the CAN ID for the RIO CAN Bus
