@@ -89,4 +89,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
         field.setRobotPose(getState().Pose);
     }
+
+    public void alignToVision() {
+        System.out.println(field.getObject("Vision").getPose());
+        // getState().Pose = field.getObject("Vision").getPose();
+        seedFieldRelative(field.getObject("Vision").getPose());
+    }
 }

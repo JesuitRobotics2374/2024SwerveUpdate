@@ -123,24 +123,10 @@ public class RobotContainer {
         m_driveController.back().onTrue(m_DrivetrainSubsystem.runOnce(() -> m_DrivetrainSubsystem.seedFieldRelative()));
         m_driveController.leftBumper().onTrue(new InstantCommand(() -> toggleSlow()));
         m_driveController.rightBumper().onTrue(new InstantCommand(() -> toggleRoll()));
-        m_driveController.start()
-                .onTrue(new InstantCommand(() -> System.out.println(m_DrivetrainSubsystem.getState().Pose)));
-        // new Trigger(m_operatorController::getXButton)
-        // .onTrue(new InstantCommand(m_ManipulatorSubsystem::rotateLeft,
-        // m_ManipulatorSubsystem));
-        // new Trigger(m_operatorController::getXButton)
-        // .onFalse(new InstantCommand(m_ManipulatorSubsystem::stopRotation,
-        // m_ManipulatorSubsystem));
-        // new Trigger(m_operatorController::getBButton)
-        // .onTrue(new InstantCommand(m_ManipulatorSubsystem::rotateRight,
-        // m_ManipulatorSubsystem));
-        // new Trigger(m_operatorController::getBButton)
-        // .onFalse(new InstantCommand(m_ManipulatorSubsystem::stopRotation,
-        // m_ManipulatorSubsystem));
-
-        // new Trigger(m_controller::getBButton)
+        // m_driveController.start()
         // .onTrue(new InstantCommand(() ->
-        // m_ArmSubsystem.updateAllSetpoints(ArmSetpoints.MID_NODE)));
+        // System.out.println(m_DrivetrainSubsystem.getState().Pose)));
+        m_driveController.start().onTrue(m_DrivetrainSubsystem.runOnce(() -> m_DrivetrainSubsystem.alignToVision()));
     }
 
     /**
