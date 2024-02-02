@@ -78,7 +78,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         double[] array = pose.getDoubleArray(new double[0]);
         if (array.length > 0) {
             field.getObject("Vision").setPose(
-                    new Pose2d(array[0] + 8.308975, -array[1] + 4.098925, new Rotation2d(Math.toRadians(array[5]))));
+                    new Pose2d(array[0] + 8.308975, array[1] + 4.098925, new Rotation2d(Math.toRadians(array[5]))));
             double offset = Math
                     .sqrt(Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getX(), 2)
                             + Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getY(), 2));

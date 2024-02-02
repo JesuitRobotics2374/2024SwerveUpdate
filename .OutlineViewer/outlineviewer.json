@@ -1,7 +1,4 @@
 {
-  "Clients": {
-    "open": true
-  },
   "Connections": {
     "open": true
   },
@@ -16,6 +13,9 @@
     "Subscribers": {
       "open": true
     },
+    "open": true
+  },
+  "outlineviewer@1": {
     "open": true
   },
   "transitory": {

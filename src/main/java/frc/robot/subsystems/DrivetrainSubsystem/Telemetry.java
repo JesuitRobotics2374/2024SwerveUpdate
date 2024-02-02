@@ -32,16 +32,22 @@ public class Telemetry {
     private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
     /* Robot pose for field positioning */
-    private final NetworkTable table = inst.getTable("Pose");
-    private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
-    private final StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
+    // private final NetworkTable table = inst.getTable("Pose");
+    // private final DoubleArrayPublisher fieldPub =
+    // table.getDoubleArrayTopic("robotPose").publish();
+    // private final StringPublisher fieldTypePub =
+    // table.getStringTopic(".type").publish();
 
     /* Robot speeds for general checking */
-    private final NetworkTable driveStats = inst.getTable("Drive");
-    private final DoublePublisher velocityX = driveStats.getDoubleTopic("Velocity X").publish();
-    private final DoublePublisher velocityY = driveStats.getDoubleTopic("Velocity Y").publish();
-    private final DoublePublisher speed = driveStats.getDoubleTopic("Speed").publish();
-    private final DoublePublisher odomPeriod = driveStats.getDoubleTopic("Odometry Period").publish();
+    // private final NetworkTable driveStats = inst.getTable("Drive");
+    // private final DoublePublisher velocityX = driveStats.getDoubleTopic("Velocity
+    // X").publish();
+    // private final DoublePublisher velocityY = driveStats.getDoubleTopic("Velocity
+    // Y").publish();
+    // private final DoublePublisher speed =
+    // driveStats.getDoubleTopic("Speed").publish();
+    // private final DoublePublisher odomPeriod =
+    // driveStats.getDoubleTopic("Odometry Period").publish();
 
     /* Keep a reference of the last pose to calculate the speeds */
     private Pose2d m_lastPose = new Pose2d();
@@ -77,12 +83,12 @@ public class Telemetry {
     public void telemeterize(SwerveDriveState state) {
         /* Telemeterize the pose */
         Pose2d pose = state.Pose;
-        fieldTypePub.set("Field2d");
-        fieldPub.set(new double[] {
-                pose.getX(),
-                pose.getY(),
-                pose.getRotation().getDegrees()
-        });
+        // fieldTypePub.set("Field2d");
+        // fieldPub.set(new double[] {
+        // pose.getX(),
+        // pose.getY(),
+        // pose.getRotation().getDegrees()
+        // });
 
         /* Telemeterize the robot's general speeds */
         double currentTime = Utils.getCurrentTimeSeconds();
@@ -93,10 +99,10 @@ public class Telemetry {
 
         Translation2d velocities = distanceDiff.div(diffTime);
 
-        speed.set(velocities.getNorm());
-        velocityX.set(velocities.getX());
-        velocityY.set(velocities.getY());
-        odomPeriod.set(state.OdometryPeriod);
+        // speed.set(velocities.getNorm());
+        // velocityX.set(velocities.getX());
+        // velocityY.set(velocities.getY());
+        // odomPeriod.set(state.OdometryPeriod);
 
         /* Telemeterize the module's states */
         for (int i = 0; i < 4; ++i) {
@@ -104,7 +110,7 @@ public class Telemetry {
             m_moduleDirections[i].setAngle(state.ModuleStates[i].angle);
             m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
 
-            SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
+            // SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
         }
     }
 }
