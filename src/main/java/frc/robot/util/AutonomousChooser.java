@@ -24,6 +24,7 @@ public class AutonomousChooser {
         this.trajectories = new AutonomousTrajectories(XYconstraints, Rconstraints);
 
         autonomousModeChooser.setDefaultOption("Test thing", AutonomousMode.ONE_METER_F);
+        autonomousModeChooser.addOption("Field Test", AutonomousMode.FIELD_TEST);
     }
 
     public SendableChooser<AutonomousMode> getModeChooser() {
@@ -33,12 +34,26 @@ public class AutonomousChooser {
     public Command getOneMeterFAuto(RobotContainer container) {
         SequentialCommandGroup command = new SequentialCommandGroup();
 
+        command.addRequirements(container.getDrivetrain());
+
         command.addCommands(resetRobotPose(container), new FollowCommand(container.getDrivetrain(),
                 new HolonomicPathBuilder()
                         .andThen(new Line(XYconstraints, Rconstraints, new Pose2d(1, 0, new Rotation2d(0)), false))
                         .andThen(new Line(XYconstraints, Rconstraints, new Pose2d(0, 1, new Rotation2d(0)), false))
                         .andThen(new Line(XYconstraints, Rconstraints, new Pose2d(-1, 0, new Rotation2d(0)), false))
                         .andThen(new Line(XYconstraints, Rconstraints, new Pose2d(0, -1, new Rotation2d(0)), false))));
+
+        return command;
+    }
+
+    public Command getFieldTestAuto(RobotContainer container) {
+        SequentialCommandGroup command = new SequentialCommandGroup();
+        System.out.println("yes");
+        command.addCommands(
+                resetToVision(container),
+                new FollowCommand(container.getDrivetrain(), new HolonomicPathBuilder().andThen(
+                        new Line(XYconstraints, Rconstraints, new Pose2d(13.4, 5.3, new Rotation2d(0)), true, .1,
+                                .7))));
 
         return command;
     }
@@ -52,12 +67,19 @@ public class AutonomousChooser {
                 () -> container.getDrivetrain().seedFieldRelative(new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
     }
 
+    public Command resetToVision(RobotContainer container) {
+        System.out.println(container.getDrivetrain().getState().Pose);
+        return new InstantCommand(() -> container.getDrivetrain().alignToVision());
+    }
+
     // Handler to determine what command was requested for the autonmous routine to
     // execute
     public Command getCommand(RobotContainer container) {
         switch (autonomousModeChooser.getSelected()) {
             case ONE_METER_F:
                 return getOneMeterFAuto(container);
+            case FIELD_TEST:
+                return getFieldTestAuto(container);
             default:
                 break;
         }
@@ -65,6 +87,6 @@ public class AutonomousChooser {
     }
 
     private enum AutonomousMode {
-        ONE_METER_F
+        ONE_METER_F, FIELD_TEST
     }
 }

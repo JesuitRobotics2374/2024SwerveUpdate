@@ -14,14 +14,32 @@ public class Line extends SplineAbstract {
 
     public Line(Constraints XYconstraints, Constraints Rconstraints, Pose2d endPose2d, boolean fieldCentric) {
         this.endPose2d = endPose2d;
-        Xcontroller = new ProfiledPIDController(1.6, 0.3, 0.1, XYconstraints);
-        Ycontroller = new ProfiledPIDController(1.6, 0.3, 0.1, XYconstraints);
+        Xcontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
+        Ycontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
         Rcontroller = new ProfiledPIDController(0.4, 0.08, 0.025, Rconstraints);
         Rcontroller.enableContinuousInput(0, Math.PI * 2);
         Xcontroller.setGoal(endPose2d.getX());
         Ycontroller.setGoal(endPose2d.getY());
         Rcontroller.setGoal(endPose2d.getRotation().getDegrees());
         Rcontroller.setTolerance(Math.PI / 36);
+        Xcontroller.setTolerance(0.05, 0.5);
+        Ycontroller.setTolerance(0.05, 0.5);
+        this.fieldCentric = fieldCentric;
+    }
+
+    public Line(Constraints XYconstraints, Constraints Rconstraints, Pose2d endPose2d, boolean fieldCentric,
+            double positionTolerance, double velocityTolerance) {
+        this.endPose2d = endPose2d;
+        Xcontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
+        Ycontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
+        Rcontroller = new ProfiledPIDController(0.4, 0.08, 0.025, Rconstraints);
+        Rcontroller.enableContinuousInput(0, Math.PI * 2);
+        Xcontroller.setGoal(endPose2d.getX());
+        Ycontroller.setGoal(endPose2d.getY());
+        Rcontroller.setGoal(endPose2d.getRotation().getDegrees());
+        Rcontroller.setTolerance(Math.PI / 36);
+        Xcontroller.setTolerance(positionTolerance, velocityTolerance);
+        Ycontroller.setTolerance(positionTolerance, velocityTolerance);
         this.fieldCentric = fieldCentric;
     }
 

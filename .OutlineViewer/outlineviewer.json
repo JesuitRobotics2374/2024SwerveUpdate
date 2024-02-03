@@ -18,6 +18,14 @@
   "outlineviewer@1": {
     "open": true
   },
+  "retained": {
+    "limelight": {
+      "double[]##v_/limelight/botpose": {
+        "open": true
+      },
+      "open": true
+    }
+  },
   "transitory": {
     "Pose": {
       "open": true

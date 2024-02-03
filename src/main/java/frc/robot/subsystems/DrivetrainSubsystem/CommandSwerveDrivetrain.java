@@ -8,8 +8,12 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -52,6 +56,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             startSimThread();
         }
         tab.add(field);
+        Matrix<N3, N1> matrix = new Matrix<>(Nat.N3(), Nat.N1());
+        matrix.set(0, 0, 7);
+        matrix.set(1, 0, 7);
+        matrix.set(2, 0, .9);
+        setVisionMeasurementStdDevs(matrix);
     }
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -79,13 +88,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         if (array.length > 0) {
             field.getObject("Vision").setPose(
                     new Pose2d(array[0] + 8.308975, array[1] + 4.098925, new Rotation2d(Math.toRadians(array[5]))));
-            double offset = Math
-                    .sqrt(Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getX(), 2)
-                            + Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getY(), 2));
-            if (offset < 1 && Math.abs(field.getObject("Vision").getPose().getRotation().getDegrees()
-                    - getState().Pose.getRotation().getDegrees()) < 30) {
-                addVisionMeasurement(field.getObject("Vision").getPose(), Timer.getFPGATimestamp());
+            if (field.getObject("Vision").getPose().getX() != 0 || field.getObject("Vision").getPose().getX() != 0) {
+                double offset = Math
+                        .sqrt(Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getX(), 2)
+                                + Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getY(), 2));
+                if (offset < 1 && Math.abs(field.getObject("Vision").getPose().getRotation().getDegrees()
+                        - getState().Pose.getRotation().getDegrees()) < 30) {
+                    addVisionMeasurement(field.getObject("Vision").getPose(), Timer.getFPGATimestamp());
+                }
             }
+
         }
         field.setRobotPose(getState().Pose);
     }
