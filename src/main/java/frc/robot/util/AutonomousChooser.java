@@ -11,18 +11,15 @@ import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.HolonomicPathBu
 import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.Splines.Line;
 
 public class AutonomousChooser {
-    private final AutonomousTrajectories trajectories;
 
-    private final Constraints XYconstraints = new Constraints(2,
-            2);
+    private final Constraints XYconstraints = new Constraints(1,
+            0.7);
     private final Constraints Rconstraints = new Constraints(
             Math.PI * .5 / 4, 1);
 
     private final SendableChooser<AutonomousMode> autonomousModeChooser = new SendableChooser<>();
 
     public AutonomousChooser() {
-        this.trajectories = new AutonomousTrajectories(XYconstraints, Rconstraints);
-
         autonomousModeChooser.setDefaultOption("Test thing", AutonomousMode.ONE_METER_F);
         autonomousModeChooser.addOption("Field Test", AutonomousMode.FIELD_TEST);
     }
@@ -52,8 +49,8 @@ public class AutonomousChooser {
         command.addCommands(
                 resetToVision(container),
                 new FollowCommand(container.getDrivetrain(), new HolonomicPathBuilder().andThen(
-                        new Line(XYconstraints, Rconstraints, new Pose2d(13.4, 5.3, new Rotation2d(0)), true, .1,
-                                .7))));
+                        new Line(XYconstraints, Rconstraints, new Pose2d(13.4, 5, new Rotation2d(0)), true, .1,
+                                .5))));
 
         return command;
     }
