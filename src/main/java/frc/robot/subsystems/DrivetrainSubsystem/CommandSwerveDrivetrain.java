@@ -95,7 +95,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 if (offset < 2 && Math.abs(field.getObject("Vision").getPose().getRotation().getDegrees()
                         - getState().Pose.getRotation().getDegrees()) < 30) {
                     addVisionMeasurement(field.getObject("Vision").getPose(), Timer.getFPGATimestamp() - .25);
-                }
+                } // Timer.getFPGATimestamp() - (botpose[6]/1000.0)
             }
 
         }
