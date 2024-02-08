@@ -16,7 +16,7 @@ public class Line extends SplineAbstract {
         this.endPose2d = endPose2d;
         Xcontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
         Ycontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
-        Rcontroller = new ProfiledPIDController(0.4, 0.08, 0.025, Rconstraints);
+        Rcontroller = new ProfiledPIDController(0.6, 0.14, 0.04, Rconstraints);
         Rcontroller.enableContinuousInput(0, Math.PI * 2);
         Xcontroller.setGoal(endPose2d.getX());
         Ycontroller.setGoal(endPose2d.getY());
@@ -32,7 +32,7 @@ public class Line extends SplineAbstract {
         this.endPose2d = endPose2d;
         Xcontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
         Ycontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
-        Rcontroller = new ProfiledPIDController(0.4, 0.08, 0.025, Rconstraints);
+        Rcontroller = new ProfiledPIDController(0.6, 0.14, 0.04, Rconstraints);
         Rcontroller.enableContinuousInput(0, Math.PI * 2);
         Xcontroller.setGoal(endPose2d.getX());
         Ycontroller.setGoal(endPose2d.getY());

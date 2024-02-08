@@ -13,15 +13,22 @@ import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.Splines.Line;
 public class AutonomousChooser {
 
     private final Constraints XYconstraints = new Constraints(1,
-            0.7);
+            0.5);
     private final Constraints Rconstraints = new Constraints(
             Math.PI * .5 / 4, 1);
+
+    private final Constraints SlowXYconstraints = new Constraints(0.5,
+            0.25);
+    private final Constraints SlowRconstraints = new Constraints(
+            Math.PI * .5 / 8, 5);
 
     private final SendableChooser<AutonomousMode> autonomousModeChooser = new SendableChooser<>();
 
     public AutonomousChooser() {
         autonomousModeChooser.setDefaultOption("Test thing", AutonomousMode.ONE_METER_F);
         autonomousModeChooser.addOption("Field Test", AutonomousMode.FIELD_TEST);
+        autonomousModeChooser.addOption("Shooter Travel Test", AutonomousMode.SHOOTER_TRAVEL);
+        autonomousModeChooser.addOption("Amp Travel Test", AutonomousMode.AMP_TRAVEL);
     }
 
     public SendableChooser<AutonomousMode> getModeChooser() {
@@ -55,6 +62,35 @@ public class AutonomousChooser {
         return command;
     }
 
+    public Command getAmpTravelAuto(RobotContainer container) {
+        SequentialCommandGroup command = new SequentialCommandGroup();
+        System.out.println("yipee");
+        command.addCommands(
+                resetToVision(container),
+                new FollowCommand(container.getDrivetrain(), new HolonomicPathBuilder().andThen(
+                        new Line(XYconstraints, Rconstraints, new Pose2d(14.58, 7.1, new Rotation2d(Math.PI / 2)), true,
+                                .6,
+                                .7))
+                        .andThen(new Line(SlowXYconstraints, SlowRconstraints,
+                                new Pose2d(14.8, 7.6, new Rotation2d(Math.PI / 2)), true, 0.07, 0.2))));
+
+        return command;
+    }
+
+    public Command getShooterTravelAuto(RobotContainer container) {
+        SequentialCommandGroup command = new SequentialCommandGroup();
+        System.out.println("yipee");
+        command.addCommands(
+                resetToVision(container),
+                new FollowCommand(container.getDrivetrain(), new HolonomicPathBuilder().andThen(
+                        new Line(XYconstraints, Rconstraints, new Pose2d(14.58, 5.7, new Rotation2d(0)), true, .6,
+                                .7))
+                        .andThen(new Line(SlowXYconstraints, SlowRconstraints,
+                                new Pose2d(15.28, 5.7, new Rotation2d(0)), true, 0.07, 0.2))));
+
+        return command;
+    }
+
     public Command resetRobotPose(RobotContainer container, Pose2d pose2d) {
         return new InstantCommand(() -> container.getDrivetrain().seedFieldRelative(pose2d));
     }
@@ -77,6 +113,10 @@ public class AutonomousChooser {
                 return getOneMeterFAuto(container);
             case FIELD_TEST:
                 return getFieldTestAuto(container);
+            case SHOOTER_TRAVEL:
+                return getShooterTravelAuto(container);
+            case AMP_TRAVEL:
+                return getAmpTravelAuto(container);
             default:
                 break;
         }
@@ -84,6 +124,6 @@ public class AutonomousChooser {
     }
 
     private enum AutonomousMode {
-        ONE_METER_F, FIELD_TEST
+        ONE_METER_F, FIELD_TEST, SHOOTER_TRAVEL, AMP_TRAVEL
     }
 }

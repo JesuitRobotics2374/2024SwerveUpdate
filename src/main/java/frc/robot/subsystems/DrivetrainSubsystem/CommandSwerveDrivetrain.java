@@ -57,8 +57,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
         tab.add(field);
         Matrix<N3, N1> matrix = new Matrix<>(Nat.N3(), Nat.N1());
-        matrix.set(0, 0, 3);
-        matrix.set(1, 0, 3);
+        matrix.set(0, 0, 4);
+        matrix.set(1, 0, 4);
         matrix.set(2, 0, .9);
         setVisionMeasurementStdDevs(matrix);
     }
@@ -92,12 +92,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 double offset = Math
                         .sqrt(Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getX(), 2)
                                 + Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getY(), 2));
-                if (offset < 2 && Math.abs(field.getObject("Vision").getPose().getRotation().getDegrees()
+                if (offset < 1 && Math.abs(field.getObject("Vision").getPose().getRotation().getDegrees()
                         - getState().Pose.getRotation().getDegrees()) < 30) {
-                    addVisionMeasurement(field.getObject("Vision").getPose(), Timer.getFPGATimestamp() - .25);
+                    addVisionMeasurement(field.getObject("Vision").getPose(),
+                            Timer.getFPGATimestamp() - (array[6] / 1000.0));
                 } // Timer.getFPGATimestamp() - (botpose[6]/1000.0)
             }
-
         }
         field.setRobotPose(getState().Pose);
     }
