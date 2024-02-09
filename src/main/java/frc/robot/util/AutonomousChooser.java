@@ -15,12 +15,12 @@ public class AutonomousChooser {
     private final Constraints XYconstraints = new Constraints(1,
             0.4);
     private final Constraints Rconstraints = new Constraints(
-            Math.PI * .5 / 2, .5);
+            Math.PI * .5, .5);
 
     private final Constraints SlowXYconstraints = new Constraints(0.5,
             0.25);
     private final Constraints SlowRconstraints = new Constraints(
-            Math.PI * .5 / 3, 5);
+            Math.PI * .5 / 2, 5);
 
     private final SendableChooser<AutonomousMode> autonomousModeChooser = new SendableChooser<>();
 
