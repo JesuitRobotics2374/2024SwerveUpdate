@@ -13,14 +13,14 @@ import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.Splines.Line;
 public class AutonomousChooser {
 
     private final Constraints XYconstraints = new Constraints(1,
-            0.5);
+            0.4);
     private final Constraints Rconstraints = new Constraints(
-            Math.PI * .5 / 4, 1);
+            Math.PI * .5 / 2, .5);
 
     private final Constraints SlowXYconstraints = new Constraints(0.5,
             0.25);
     private final Constraints SlowRconstraints = new Constraints(
-            Math.PI * .5 / 8, 5);
+            Math.PI * .5 / 3, 5);
 
     private final SendableChooser<AutonomousMode> autonomousModeChooser = new SendableChooser<>();
 
@@ -42,10 +42,8 @@ public class AutonomousChooser {
 
         command.addCommands(resetRobotPose(container), new FollowCommand(container.getDrivetrain(),
                 new HolonomicPathBuilder()
-                        .andThen(new Line(XYconstraints, Rconstraints, new Pose2d(1, 0, new Rotation2d(0)), false))
-                        .andThen(new Line(XYconstraints, Rconstraints, new Pose2d(0, 1, new Rotation2d(0)), false))
-                        .andThen(new Line(XYconstraints, Rconstraints, new Pose2d(-1, 0, new Rotation2d(0)), false))
-                        .andThen(new Line(XYconstraints, Rconstraints, new Pose2d(0, -1, new Rotation2d(0)), false))));
+                        .andThen(new Line(XYconstraints, Rconstraints, new Pose2d(0, 0, new Rotation2d(Math.PI / 2)),
+                                false))));
 
         return command;
     }
@@ -68,11 +66,11 @@ public class AutonomousChooser {
         command.addCommands(
                 resetToVision(container),
                 new FollowCommand(container.getDrivetrain(), new HolonomicPathBuilder().andThen(
-                        new Line(XYconstraints, Rconstraints, new Pose2d(14.58, 7.1, new Rotation2d(Math.PI / 2)), true,
-                                .6,
-                                .7))
+                        new Line(XYconstraints, Rconstraints, new Pose2d(14.78, 6.9, new Rotation2d(Math.PI / 2)), true,
+                                .5,
+                                .4))
                         .andThen(new Line(SlowXYconstraints, SlowRconstraints,
-                                new Pose2d(14.8, 7.6, new Rotation2d(Math.PI / 2)), true, 0.07, 0.2))));
+                                new Pose2d(14.78, 7.48, new Rotation2d(Math.PI / 2)), true, 0.03, 0.05))));
 
         return command;
     }
@@ -83,10 +81,10 @@ public class AutonomousChooser {
         command.addCommands(
                 resetToVision(container),
                 new FollowCommand(container.getDrivetrain(), new HolonomicPathBuilder().andThen(
-                        new Line(XYconstraints, Rconstraints, new Pose2d(14.58, 5.7, new Rotation2d(0)), true, .6,
-                                .7))
+                        new Line(XYconstraints, Rconstraints, new Pose2d(14.5, 5.57, new Rotation2d(0)), true, .8,
+                                .6))
                         .andThen(new Line(SlowXYconstraints, SlowRconstraints,
-                                new Pose2d(15.28, 5.7, new Rotation2d(0)), true, 0.07, 0.2))));
+                                new Pose2d(15.15, 5.57, new Rotation2d(0)), true, 0.03, 0.05))));
 
         return command;
     }

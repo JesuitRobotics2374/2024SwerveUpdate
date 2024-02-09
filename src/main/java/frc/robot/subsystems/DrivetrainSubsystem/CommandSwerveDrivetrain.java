@@ -1,5 +1,6 @@
 package frc.robot.subsystems.DrivetrainSubsystem;
 
+import java.util.ArrayList;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
@@ -40,6 +41,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     Field2d field = new Field2d();
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
     NetworkTableEntry pose = table.getEntry("botpose");
+    ArrayList<Double> xList = new ArrayList<>();
+    ArrayList<Double> yList = new ArrayList<>();
+    ArrayList<Double> rList = new ArrayList<>();
+    ArrayList<Double> tList = new ArrayList<>();
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency,
             SwerveModuleConstants... modules) {
@@ -85,6 +90,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     @Override
     public void periodic() {
         double[] array = pose.getDoubleArray(new double[0]);
+        boolean flag = isTargetValid(array);
         if (array.length > 0) {
             field.getObject("Vision").setPose(
                     new Pose2d(array[0] + 8.308975, array[1] + 4.098925, new Rotation2d(Math.toRadians(array[5]))));
@@ -92,7 +98,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 double offset = Math
                         .sqrt(Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getX(), 2)
                                 + Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getY(), 2));
-                if (offset < 1 && Math.abs(field.getObject("Vision").getPose().getRotation().getDegrees()
+                if (flag && offset < 1 && Math.abs(field.getObject("Vision").getPose().getRotation().getDegrees()
                         - getState().Pose.getRotation().getDegrees()) < 30) {
                     addVisionMeasurement(field.getObject("Vision").getPose(),
                             Timer.getFPGATimestamp() - (array[6] / 1000.0));
@@ -100,6 +106,41 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             }
         }
         field.setRobotPose(getState().Pose);
+    }
+
+    public boolean isTargetValid(double[] array) {
+        xList.add(array[0]);
+        yList.add(array[1]);
+        rList.add(array[5]);
+        tList.add(array[6]);
+        if (xList.size() < 20) {
+            return false;
+        }
+        double[] x = new double[xList.size() - 1];
+        double[] y = new double[yList.size() - 1];
+        double[] r = new double[rList.size() - 1];
+
+        for (int i = 0; i < x.length; i++) {
+            x[i] = (xList.get(i) - xList.get(i + 1)) / (tList.get(i + 1) / 1000);
+            y[i] = (yList.get(i) - yList.get(i + 1)) / (tList.get(i + 1) / 1000);
+            r[i] = (rList.get(i) - rList.get(i + 1)) / (tList.get(i + 1) / 1000);
+        }
+        for (int i = 0; i < x.length - 1; i++) {
+            if (Math.abs(x[i] - x[i + 1]) > 1.6 || Math.abs(y[i] - y[i + 1]) > 1.6 || Math.abs(x[i] - x[i + 1]) > 135) {
+                xList.remove(0);
+                yList.remove(0);
+                rList.remove(0);
+                tList.remove(0);
+                return false;
+            }
+        }
+
+        // System.out.println(x[0] - x[1]);
+        xList.remove(0);
+        yList.remove(0);
+        rList.remove(0);
+        tList.remove(0);
+        return true;
     }
 
     public void alignToVision() {

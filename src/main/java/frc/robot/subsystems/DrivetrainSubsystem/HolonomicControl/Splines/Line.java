@@ -14,9 +14,9 @@ public class Line extends SplineAbstract {
 
     public Line(Constraints XYconstraints, Constraints Rconstraints, Pose2d endPose2d, boolean fieldCentric) {
         this.endPose2d = endPose2d;
-        Xcontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
-        Ycontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
-        Rcontroller = new ProfiledPIDController(0.6, 0.14, 0.04, Rconstraints);
+        Xcontroller = new ProfiledPIDController(1.3, 0.2, 0.1, XYconstraints);
+        Ycontroller = new ProfiledPIDController(1.3, 0.2, 0.1, XYconstraints);
+        Rcontroller = new ProfiledPIDController(0.6, 0.05, 0.02, Rconstraints);
         Rcontroller.enableContinuousInput(0, Math.PI * 2);
         Xcontroller.setGoal(endPose2d.getX());
         Ycontroller.setGoal(endPose2d.getY());
@@ -24,15 +24,16 @@ public class Line extends SplineAbstract {
         Rcontroller.setTolerance(Math.PI / 36);
         Xcontroller.setTolerance(0.05, 0.5);
         Ycontroller.setTolerance(0.05, 0.5);
+        Rcontroller.setTolerance(0.02, 0.03);
         this.fieldCentric = fieldCentric;
     }
 
     public Line(Constraints XYconstraints, Constraints Rconstraints, Pose2d endPose2d, boolean fieldCentric,
             double positionTolerance, double velocityTolerance) {
         this.endPose2d = endPose2d;
-        Xcontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
-        Ycontroller = new ProfiledPIDController(1.3, 0.3, 0.1, XYconstraints);
-        Rcontroller = new ProfiledPIDController(0.6, 0.14, 0.04, Rconstraints);
+        Xcontroller = new ProfiledPIDController(1.3, 0.2, 0.1, XYconstraints);
+        Ycontroller = new ProfiledPIDController(1.3, 0.2, 0.1, XYconstraints);
+        Rcontroller = new ProfiledPIDController(0.6, 0.05, 0.02, Rconstraints);
         Rcontroller.enableContinuousInput(0, Math.PI * 2);
         Xcontroller.setGoal(endPose2d.getX());
         Ycontroller.setGoal(endPose2d.getY());
@@ -40,6 +41,7 @@ public class Line extends SplineAbstract {
         Rcontroller.setTolerance(Math.PI / 36);
         Xcontroller.setTolerance(positionTolerance, velocityTolerance);
         Ycontroller.setTolerance(positionTolerance, velocityTolerance);
+        Rcontroller.setTolerance(0.02, 0.03);
         this.fieldCentric = fieldCentric;
     }
 
@@ -61,9 +63,23 @@ public class Line extends SplineAbstract {
 
     @Override
     public ChassisSpeeds getMovement(Pose2d currentPose2d) {
-        return new ChassisSpeeds(Xcontroller.calculate(currentPose2d.getX()),
+        ChassisSpeeds speeds = new ChassisSpeeds(Xcontroller.calculate(currentPose2d.getX()),
                 Ycontroller.calculate(currentPose2d.getY()),
                 Rcontroller.calculate(currentPose2d.getRotation().getRadians()));
+        if (Math.abs(speeds.vxMetersPerSecond) > Xcontroller.getConstraints().maxVelocity) {
+            speeds.vxMetersPerSecond = Math.copySign(Xcontroller.getConstraints().maxVelocity,
+                    speeds.vxMetersPerSecond);
+        }
+        if (Math.abs(speeds.vyMetersPerSecond) > Ycontroller.getConstraints().maxVelocity) {
+            speeds.vyMetersPerSecond = Math.copySign(Ycontroller.getConstraints().maxVelocity,
+                    speeds.vyMetersPerSecond);
+        }
+        if (Math.abs(speeds.omegaRadiansPerSecond) > Rcontroller.getConstraints().maxVelocity) {
+            speeds.omegaRadiansPerSecond = Math.copySign(Rcontroller.getConstraints().maxVelocity,
+                    speeds.omegaRadiansPerSecond);
+        }
+        return speeds;
+
     }
 
     @Override

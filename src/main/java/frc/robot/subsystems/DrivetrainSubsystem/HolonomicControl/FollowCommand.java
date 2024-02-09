@@ -26,7 +26,8 @@ public class FollowCommand extends Command {
     @Override
     public void initialize() {
         builder.pathList.peekFirst().initialize(subsystem.getState().Pose);
-        subsystem.seedFieldRelative(new Pose2d(subsystem.getState().Pose.getTranslation(), new Rotation2d()));
+        // subsystem.seedFieldRelative(new
+        // Pose2d(subsystem.getState().Pose.getTranslation(), new Rotation2d()));
     }
 
     @Override
