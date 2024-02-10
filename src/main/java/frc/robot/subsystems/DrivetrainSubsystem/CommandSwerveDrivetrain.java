@@ -61,6 +61,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             startSimThread();
         }
         tab.add(field);
+        tab.addDouble("Offset", () -> this.m_fieldRelativeOffset.getDegrees());
         Matrix<N3, N1> matrix = new Matrix<>(Nat.N3(), Nat.N1());
         matrix.set(0, 0, 4);
         matrix.set(1, 0, 4);
@@ -146,6 +147,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     public void alignToVision() {
         System.out.println(field.getObject("Vision").getPose());
         // getState().Pose = field.getObject("Vision").getPose();
+        seedFieldRelative(new Pose2d(field.getObject("Vision").getPose().getTranslation(), new Rotation2d()));
+        seedFieldRelative();
         seedFieldRelative(field.getObject("Vision").getPose());
     }
 }

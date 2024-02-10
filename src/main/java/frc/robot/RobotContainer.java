@@ -51,7 +51,6 @@ public class RobotContainer {
         // m_DrivetrainSubsystem.getState().Pose = new
         // Pose2d(m_DrivetrainSubsystem.getState().Pose.getTranslation(),
         // new Rotation2d());
-        m_DrivetrainSubsystem.seedFieldRelative(new Pose2d());
         // m_DrivetrainSubsystem.getPigeon2().getConfigurator()
         // .apply(new Pigeon2Configuration().withMountPose(new
         // MountPoseConfigs().withMountPoseYaw(0)));
@@ -125,6 +124,7 @@ public class RobotContainer {
         // .onTrue(new InstantCommand(() ->
         // System.out.println(m_DrivetrainSubsystem.getState().Pose)));
         m_driveController.start().onTrue(m_DrivetrainSubsystem.runOnce(() -> m_DrivetrainSubsystem.alignToVision()));
+        ;
     }
 
     /**

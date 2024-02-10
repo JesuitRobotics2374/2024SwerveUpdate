@@ -21,7 +21,6 @@ public class Line extends SplineAbstract {
         Xcontroller.setGoal(endPose2d.getX());
         Ycontroller.setGoal(endPose2d.getY());
         Rcontroller.setGoal(endPose2d.getRotation().getDegrees());
-        Rcontroller.setTolerance(Math.PI / 36);
         Xcontroller.setTolerance(0.05, 0.5);
         Ycontroller.setTolerance(0.05, 0.5);
         Rcontroller.setTolerance(0.02);
@@ -37,7 +36,7 @@ public class Line extends SplineAbstract {
         Rcontroller.enableContinuousInput(0, Math.PI * 2);
         Xcontroller.setGoal(endPose2d.getX());
         Ycontroller.setGoal(endPose2d.getY());
-        Rcontroller.setGoal(endPose2d.getRotation().getDegrees());
+        Rcontroller.setGoal(endPose2d.getRotation().getRadians());
         Xcontroller.setTolerance(positionTolerance, velocityTolerance);
         Ycontroller.setTolerance(positionTolerance, velocityTolerance);
         Rcontroller.setTolerance(0.02);
@@ -52,7 +51,7 @@ public class Line extends SplineAbstract {
         }
         Xcontroller.setGoal(endPose2d.getX());
         Ycontroller.setGoal(endPose2d.getY());
-        Rcontroller.setGoal(endPose2d.getRotation().getDegrees());
+        Rcontroller.setGoal(endPose2d.getRotation().getRadians());
         System.out.println(currentPose2d);
         System.out.println(endPose2d);
         Xcontroller.reset(currentPose2d.getX());
@@ -82,7 +81,8 @@ public class Line extends SplineAbstract {
             speeds.omegaRadiansPerSecond += Math.PI / 3;
             System.out.println("b");
         }
-        System.out.println((currentPose2d.getRotation().minus(endPose2d.getRotation()).getDegrees() + 360) % 360);
+        System.out.println((currentPose2d.getRotation().minus(endPose2d.getRotation()).getDegrees()
+                + 360) % 360);
         if (Math.abs(speeds.omegaRadiansPerSecond) > Rcontroller.getConstraints().maxVelocity) {
             speeds.omegaRadiansPerSecond = Math.copySign(Rcontroller.getConstraints().maxVelocity,
                     speeds.omegaRadiansPerSecond);
