@@ -12,8 +12,10 @@ public class FollowCommand extends Command {
     HolonomicPathBuilder builder;
     CommandSwerveDrivetrain subsystem;
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
-                                                                     // driving in open loop
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withDeadband(0.05).withRotationalDeadband(0.05); // I
+                                                                                                                     // want
+                                                                                                                     // field-centric
+    // driving in open loop
 
     public FollowCommand(CommandSwerveDrivetrain subsystem, HolonomicPathBuilder builder) {
         this.builder = builder;

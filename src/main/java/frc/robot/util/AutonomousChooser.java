@@ -95,7 +95,8 @@ public class AutonomousChooser {
 
     public Command resetRobotPose(RobotContainer container) {
         return new InstantCommand(
-                () -> container.getDrivetrain().seedFieldRelative(new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
+                () -> container.getDrivetrain().runOnce(() -> container.getDrivetrain()
+                        .seedFieldRelative(new Pose2d(0, 0, Rotation2d.fromDegrees(0)))));
     }
 
     public Command resetToVision(RobotContainer container) {
