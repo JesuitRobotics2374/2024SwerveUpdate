@@ -70,7 +70,7 @@ public class AutonomousChooser {
                                 .5,
                                 .4))
                         .andThen(new Line(SlowXYconstraints, SlowRconstraints,
-                                new Pose2d(14.78, 7.48, new Rotation2d(Math.PI / 2)), true, 0.03, 0.05))));
+                                new Pose2d(14.78, 7.28, new Rotation2d(Math.PI / 2)), true, 0.03, 0.05))));
 
         return command;
     }

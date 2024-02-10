@@ -72,17 +72,17 @@ public class Line extends SplineAbstract {
             speeds.vyMetersPerSecond = Math.copySign(Ycontroller.getConstraints().maxVelocity,
                     speeds.vyMetersPerSecond);
         }
-        if ((currentPose2d.getRotation().minus(endPose2d.getRotation()).getDegrees() + 360) % 360 > 2
+        if ((currentPose2d.getRotation().minus(endPose2d.getRotation()).getDegrees() + 360) % 360 > 4
                 && (currentPose2d.getRotation().minus(endPose2d.getRotation()).getDegrees() + 360) % 360 < 100) {
             speeds.omegaRadiansPerSecond -= Math.PI / 3;
-            System.out.println("a");
-        } else if ((currentPose2d.getRotation().minus(endPose2d.getRotation()).getDegrees() + 360) % 360 < 358
+            // System.out.println("a");
+        } else if ((currentPose2d.getRotation().minus(endPose2d.getRotation()).getDegrees() + 360) % 360 < 356
                 && (currentPose2d.getRotation().minus(endPose2d.getRotation()).getDegrees() + 360) % 360 > 260) {
             speeds.omegaRadiansPerSecond += Math.PI / 3;
-            System.out.println("b");
+            // System.out.println("b");
         }
-        System.out.println((currentPose2d.getRotation().minus(endPose2d.getRotation()).getDegrees()
-                + 360) % 360);
+        // System.out.println((currentPose2d.getRotation().minus(endPose2d.getRotation()).getDegrees()
+        // + 360) % 360);
         if (Math.abs(speeds.omegaRadiansPerSecond) > Rcontroller.getConstraints().maxVelocity) {
             speeds.omegaRadiansPerSecond = Math.copySign(Rcontroller.getConstraints().maxVelocity,
                     speeds.omegaRadiansPerSecond);
