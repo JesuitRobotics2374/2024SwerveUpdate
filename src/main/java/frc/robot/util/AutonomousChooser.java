@@ -1,11 +1,22 @@
 package frc.robot.util;
 
+import java.util.List;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.DrivetrainSubsystem.CommandSwerveDrivetrain;
 import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.FollowCommand;
 import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.HolonomicPathBuilder;
 import frc.robot.subsystems.DrivetrainSubsystem.HolonomicControl.Splines.Line;
@@ -21,7 +32,8 @@ public class AutonomousChooser {
             0.25);
     private final Constraints SlowRconstraints = new Constraints(
             Math.PI * .5 / 2, 5);
-
+    TrajectoryConfig config = new TrajectoryConfig(XYconstraints.maxVelocity, XYconstraints.maxAcceleration)
+            .setKinematics(CommandSwerveDrivetrain.getInstance().getKinematics());
     private final SendableChooser<AutonomousMode> autonomousModeChooser = new SendableChooser<>();
 
     public AutonomousChooser() {
@@ -29,6 +41,7 @@ public class AutonomousChooser {
         autonomousModeChooser.addOption("Field Test", AutonomousMode.FIELD_TEST);
         autonomousModeChooser.addOption("Shooter Travel Test", AutonomousMode.SHOOTER_TRAVEL);
         autonomousModeChooser.addOption("Amp Travel Test", AutonomousMode.AMP_TRAVEL);
+
     }
 
     public SendableChooser<AutonomousMode> getModeChooser() {
@@ -53,9 +66,8 @@ public class AutonomousChooser {
         System.out.println("yes");
         command.addCommands(
                 resetToVision(container),
-                new FollowCommand(container.getDrivetrain(), new HolonomicPathBuilder().andThen(
-                        new Line(XYconstraints, Rconstraints, new Pose2d(13.4, 5, new Rotation2d(0)), true, .1,
-                                .5))));
+                followTrajectory(container, TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)),
+                        List.of(new Translation2d(1, 1)), new Pose2d(2, 0, new Rotation2d()), config)));
 
         return command;
     }
@@ -66,7 +78,7 @@ public class AutonomousChooser {
         command.addCommands(
                 resetToVision(container),
                 new FollowCommand(container.getDrivetrain(), new HolonomicPathBuilder().andThen(
-                        new Line(XYconstraints, Rconstraints, new Pose2d(14.78, 6.9, new Rotation2d(Math.PI / 2)), true,
+                        new Line(XYconstraints, Rconstraints, new Pose2d(14.78, 6.7, new Rotation2d(Math.PI / 2)), true,
                                 .5,
                                 .4))
                         .andThen(new Line(SlowXYconstraints, SlowRconstraints,
@@ -102,6 +114,17 @@ public class AutonomousChooser {
     public Command resetToVision(RobotContainer container) {
         System.out.println(container.getDrivetrain().getState().Pose);
         return new InstantCommand(() -> container.getDrivetrain().alignToVision());
+    }
+
+    public Command followTrajectory(RobotContainer container, Trajectory trajectory) {
+        PIDController Xcontroller = new PIDController(1.5, 0, 0);
+        PIDController Ycontroller = new PIDController(1.5, 0, 0);
+        ProfiledPIDController profiledPIDController = new ProfiledPIDController(3, 0, 0, Rconstraints);
+        return new SwerveControllerCommand(trajectory,
+                () -> CommandSwerveDrivetrain.getInstance().getState().Pose,
+                CommandSwerveDrivetrain.getInstance().getKinematics(), Xcontroller, Ycontroller, profiledPIDController,
+                (x) -> CommandSwerveDrivetrain.getInstance().setStates(x), CommandSwerveDrivetrain.getInstance());
+
     }
 
     // Handler to determine what command was requested for the autonmous routine to

@@ -13,6 +13,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTable;
@@ -45,6 +47,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     ArrayList<Double> yList = new ArrayList<>();
     ArrayList<Double> rList = new ArrayList<>();
     ArrayList<Double> tList = new ArrayList<>();
+    static CommandSwerveDrivetrain instance;
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency,
             SwerveModuleConstants... modules) {
@@ -53,6 +56,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             startSimThread();
         }
         tab.add(field);
+        instance = this;
     }
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
@@ -67,6 +71,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         matrix.set(1, 0, 4);
         matrix.set(2, 0, .9);
         setVisionMeasurementStdDevs(matrix);
+        instance = this;
     }
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -150,5 +155,17 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         seedFieldRelative(new Pose2d(field.getObject("Vision").getPose().getTranslation(), new Rotation2d()));
         seedFieldRelative();
         seedFieldRelative(field.getObject("Vision").getPose());
+    }
+
+    public SwerveDriveKinematics getKinematics() {
+        return m_kinematics;
+    }
+
+    public void setStates(SwerveModuleState[] states) {
+        getState().ModuleTargets = states;
+    }
+
+    public static CommandSwerveDrivetrain getInstance() {
+        return instance;
     }
 }
