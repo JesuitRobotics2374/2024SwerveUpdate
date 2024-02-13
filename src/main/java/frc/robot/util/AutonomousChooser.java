@@ -2,6 +2,8 @@ package frc.robot.util;
 
 import java.util.List;
 
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -64,6 +66,7 @@ public class AutonomousChooser {
     public Command getFieldTestAuto(RobotContainer container) {
         SequentialCommandGroup command = new SequentialCommandGroup();
         System.out.println("yes");
+
         command.addCommands(
                 resetToVision(container),
                 followTrajectory(container, TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)),

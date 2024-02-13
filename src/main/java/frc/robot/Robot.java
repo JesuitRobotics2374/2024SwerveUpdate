@@ -62,9 +62,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        if (m_robotContainer.getDrivetrain().getDefaultCommand() != null)
-            m_robotContainer.getDrivetrain().getDefaultCommand().cancel();
-        m_autonomousCommand = m_robotContainer.getAutonomousChooser().getCommand(m_robotContainer);
+        // if (m_robotContainer.getDrivetrain().getDefaultCommand() != null)
+        // m_robotContainer.getDrivetrain().getDefaultCommand().cancel();
+        // m_autonomousCommand =
+        // m_robotContainer.getAutonomousChooser().getCommand(m_robotContainer);
+        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
         // schedule the autonomous command (example)
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();

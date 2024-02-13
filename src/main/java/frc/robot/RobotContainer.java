@@ -1,6 +1,8 @@
 package frc.robot;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
@@ -8,13 +10,14 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.AlignToSpeakerCommand;
+import frc.robot.commands.BasicCommand;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.DrivetrainSubsystem.CommandSwerveDrivetrain;
 import frc.robot.subsystems.DrivetrainSubsystem.TunerConstants;
@@ -34,6 +37,7 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
                                                                      // driving in open loop
     private final AutonomousChooser autonomousChooser = new AutonomousChooser();
+    private final SendableChooser<Command> autoChooser;
 
     private final CommandXboxController m_driveController = new CommandXboxController(
             Constants.CONTROLLER_USB_PORT_DRIVER);
@@ -48,6 +52,7 @@ public class RobotContainer {
         m_ChassisSubsystem = new ChassisSubsystem();
 
         System.out.println("container created");
+        autoChooser = AutoBuilder.buildAutoChooser();
         configureShuffleBoard();
         resetDrive();
         configureButtonBindings();
@@ -90,6 +95,14 @@ public class RobotContainer {
     }
 
     /**
+     * Register Auto Commands
+     */
+    public void registerAutoCommands() {
+        NamedCommands.registerCommand("Basic Command", new BasicCommand());
+        NamedCommands.registerCommand("Align to speaker", new AlignToSpeakerCommand());
+    }
+
+    /**
      * Set up the Shuffleboard
      */
     public void configureShuffleBoard() {
@@ -113,6 +126,7 @@ public class RobotContainer {
         tab.addDouble("X", () -> m_DrivetrainSubsystem.getState().Pose.getX());
         tab.addDouble("Y", () -> m_DrivetrainSubsystem.getState().Pose.getY());
         tab.addDouble("R", () -> m_DrivetrainSubsystem.getState().Pose.getRotation().getDegrees());
+        tab.add("Auto Chooser", autoChooser);
     }
 
     /**
@@ -127,6 +141,8 @@ public class RobotContainer {
         // .onTrue(new InstantCommand(() ->
         // System.out.println(m_DrivetrainSubsystem.getState().Pose)));
         m_driveController.start().onTrue(m_DrivetrainSubsystem.runOnce(() -> m_DrivetrainSubsystem.alignToVision()));
+        m_driveController.x().onTrue(m_DrivetrainSubsystem
+                .runOnce(() -> m_DrivetrainSubsystem.seedFieldRelative(new Pose2d(0, 0, new Rotation2d()))));
     }
 
     /**
@@ -193,6 +209,10 @@ public class RobotContainer {
      */
     public AutonomousChooser getAutonomousChooser() {
         return autonomousChooser;
+    }
+
+    public Command getAutonomousCommand() {
+        return autoChooser.getSelected();
     }
 
     /**

@@ -8,11 +8,17 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
@@ -48,10 +54,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     ArrayList<Double> rList = new ArrayList<>();
     ArrayList<Double> tList = new ArrayList<>();
     static CommandSwerveDrivetrain instance;
+    private final SwerveRequest.ApplyChassisSpeeds autoRequest = new SwerveRequest.ApplyChassisSpeeds();
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency,
             SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
+        configurePathPlanner();
         if (Utils.isSimulation()) {
             startSimThread();
         }
@@ -61,6 +69,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
+        configurePathPlanner();
         if (Utils.isSimulation()) {
             startSimThread();
         }
@@ -72,6 +81,27 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         matrix.set(2, 0, .9);
         setVisionMeasurementStdDevs(matrix);
         instance = this;
+    }
+
+    private void configurePathPlanner() {
+        double driveBaseRadius = 0;
+        for (var moduleLocation : m_moduleLocations) {
+            driveBaseRadius = Math.max(driveBaseRadius, moduleLocation.getNorm());
+        }
+
+        AutoBuilder.configureHolonomic(
+                () -> this.getState().Pose, // Supplier of current robot pose
+                this::seedFieldRelative, // Consumer for seeding pose against auto
+                this::getCurrentRobotChassisSpeeds,
+                (speeds) -> this.setControl(autoRequest.withSpeeds(speeds)), // Consumer of ChassisSpeeds to drive the
+                                                                             // robot
+                new HolonomicPathFollowerConfig(new PIDConstants(1, 0, 0.7),
+                        new PIDConstants(1, 0, 0.01),
+                        TunerConstants.kSpeedAt12VoltsMps,
+                        driveBaseRadius,
+                        new ReplanningConfig()),
+                () -> false, // Change this if the path needs to be flipped on red vs blue
+                this); // Subsystem for requirements
     }
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -99,7 +129,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         boolean flag = isTargetValid(array);
         if (array.length > 0) {
             field.getObject("Vision").setPose(
-                    new Pose2d(array[0] + 8.308975, array[1] + 4.098925, new Rotation2d(Math.toRadians(array[5]))));
+                    new Pose2d(array[0] + 9, array[1] + 3.798925, new Rotation2d(Math.toRadians(array[5]))));
             if (field.getObject("Vision").getPose().getX() != 0 || field.getObject("Vision").getPose().getX() != 0) {
                 double offset = Math
                         .sqrt(Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getX(), 2)
@@ -119,7 +149,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         yList.add(array[1]);
         rList.add(array[5]);
         tList.add(array[6]);
-        if (xList.size() < 20) {
+        if (xList.size() < 10) {
             return false;
         }
         double[] x = new double[xList.size() - 1];
@@ -159,6 +189,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public SwerveDriveKinematics getKinematics() {
         return m_kinematics;
+    }
+
+    public ChassisSpeeds getCurrentRobotChassisSpeeds() {
+        return m_kinematics.toChassisSpeeds(getState().ModuleStates);
+    }
+
+    public Command getAutoPath(String pathName) {
+        return new PathPlannerAuto(pathName);
     }
 
     public void setStates(SwerveModuleState[] states) {
