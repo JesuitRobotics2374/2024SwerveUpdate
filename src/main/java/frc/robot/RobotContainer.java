@@ -99,7 +99,7 @@ public class RobotContainer {
      */
     public void registerAutoCommands() {
         NamedCommands.registerCommand("Basic Command", new BasicCommand());
-        NamedCommands.registerCommand("Align to speaker", new AlignToSpeakerCommand());
+        NamedCommands.registerCommand("Align to speaker", new AlignToSpeakerCommand(m_DrivetrainSubsystem));
     }
 
     /**
@@ -143,6 +143,7 @@ public class RobotContainer {
         m_driveController.start().onTrue(m_DrivetrainSubsystem.runOnce(() -> m_DrivetrainSubsystem.alignToVision()));
         m_driveController.x().onTrue(m_DrivetrainSubsystem
                 .runOnce(() -> m_DrivetrainSubsystem.seedFieldRelative(new Pose2d(0, 0, new Rotation2d()))));
+        m_driveController.a().onTrue(new AlignToSpeakerCommand(m_DrivetrainSubsystem));
     }
 
     /**

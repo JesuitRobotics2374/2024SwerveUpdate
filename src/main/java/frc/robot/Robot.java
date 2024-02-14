@@ -32,6 +32,7 @@ public class Robot extends TimedRobot {
         // lights
         if (!m_robotContainer.getChassisSubsystem().isTestRobot()) {
         }
+        CommandScheduler.getInstance().cancelAll();
     }
 
     @Override
