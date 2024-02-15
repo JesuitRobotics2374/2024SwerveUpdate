@@ -127,9 +127,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     public void periodic() {
         double[] array = pose.getDoubleArray(new double[0]);
         boolean flag = isTargetValid(array);
+        // System.out.println(array.length);
         if (array.length > 0) {
             field.getObject("Vision").setPose(
-                    new Pose2d(array[0] + 9, array[1] + 3.798925, new Rotation2d(Math.toRadians(array[5]))));
+                    new Pose2d(array[0] + 9, array[1] + 4.2, new Rotation2d(Math.toRadians(array[5]))));
             if (field.getObject("Vision").getPose().getX() != 0 || field.getObject("Vision").getPose().getX() != 0) {
                 double offset = Math
                         .sqrt(Math.pow(field.getObject("Vision").getPose().relativeTo(getState().Pose).getX(), 2)
@@ -145,6 +146,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public boolean isTargetValid(double[] array) {
+        if (array.length < 3) {
+            return false;
+        }
         xList.add(array[0]);
         yList.add(array[1]);
         rList.add(array[5]);

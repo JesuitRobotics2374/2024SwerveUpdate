@@ -1,4 +1,7 @@
 {
+  "Clients": {
+    "open": true
+  },
   "Connections": {
     "open": true
   },
@@ -27,7 +30,22 @@
     }
   },
   "transitory": {
+    "FMSInfo": {
+      "open": true
+    },
+    "LiveWindow": {
+      "open": true
+    },
+    "PathPlanner": {
+      "open": true
+    },
     "Pose": {
+      "open": true
+    },
+    "Shuffleboard": {
+      "open": true
+    },
+    "SmartDashboard": {
       "open": true
     }
   }
